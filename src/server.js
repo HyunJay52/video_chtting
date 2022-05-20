@@ -1,4 +1,6 @@
-import express from 'express';
+import { WebSocketServer } from 'ws';
+import http from 'http';
+import express from 'express'; // http
 
 const app = express();
 
@@ -9,18 +11,32 @@ app.set('views', __dirname + "/views");
 app.use("/public", express.static(__dirname+"/public"));
 
 // home router
-app.get("/", (req, res) => {
-    res.render("home");
+app.get("/", (req, res) => {res.render("home");});
+app.get("/*", (req, res) => {res.redirect("/");}); //catch all
+
+const handleListen = () => console.log(`listening on ws and http://localhost:3000`);
+// app.listen(3000, handleListen); only listen http
+
+// create sever by using express app -> http
+const server = http.createServer(app);
+// create WebSocket server and pass "http server"
+const wss = new WebSocketServer({server});
+
+// request connection from front-end
+wss.on("connection", (socket) => {
+    console.log("user 👉 ", socket);
+
+    socket.emit("????")
 });
-app.get("/*", (req, res) => {
-    res.redirect("/");
-}); //catch all
 
-const handleListen = () => console.log(`listening on http://localhost:3000`);
 
-app.listen(3000, handleListen);
 
-//
+// listen
+server.listen(3000, handleListen);
+
+
+
+// front live-reload setting
 const livereload = require('livereload');
 const connectLiveReload = require('connect-livereload');
 
