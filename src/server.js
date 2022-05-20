@@ -24,10 +24,15 @@ const wss = new WebSocketServer({server});
 
 // request connection from front-end
 wss.on("connection", (socket) => {
-    console.log("user 👉 ", socket);
+    console.log("connected to brower ✅");
 
-    socket.emit("????")
+    socket.on('close', ()=> console.log("disconnected from browser ❌")); // browser kill the connection
+    socket.on('message', message => {
+        console.log(message.toString('utf-8'));
+    })
+    socket.send("hello from server 🙋‍♀️");
 });
+
 
 
 
