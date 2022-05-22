@@ -22,18 +22,21 @@ const server = http.createServer(app);
 // create WebSocket server and pass "http server"
 const wss = new WebSocketServer({server});
 
+const sockets = [];
+
 // request connection from front-end
 wss.on("connection", (socket) => {
     console.log("connected to brower ✅");
 
+    sockets.push(socket);
+
     socket.on('close', ()=> console.log("disconnected from browser ❌")); // browser kill the connection
-    socket.on('message', message => {
-        console.log(message.toString('utf-8'));
-    })
-    socket.send("hello from server 🙋‍♀️");
+    socket.on('message', (message) => {
+        //const msg = isBinary? message: message.toString('utf-8');
+        // sending messgae, msg.toString() -> front not BLOB, string
+        sockets.forEach(aSocket => aSocket.send(message.toString('utf-8')));
+    });
 });
-
-
 
 
 // listen
