@@ -13,9 +13,13 @@ html(lang="en")
 
         main 
             h3 welcome!
-            button hit!
+            
             ul
-            form
+
+            form#nick
+                input(type="text", placeholder="write a nickname", required)
+                button  save 
+            form#msg
                 input(type="text", placeholder="write a messgae", required)
                 button  send 
 

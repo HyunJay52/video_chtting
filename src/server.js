@@ -29,12 +29,29 @@ wss.on("connection", (socket) => {
     console.log("connected to brower ✅");
 
     sockets.push(socket);
+    socket["nickname"] = "Anon"; // not set a nickname yet!
 
     socket.on('close', ()=> console.log("disconnected from browser ❌")); // browser kill the connection
-    socket.on('message', (message) => {
+    socket.on('message', (msg) => {
         //const msg = isBinary? message: message.toString('utf-8');
         // sending messgae, msg.toString() -> front not BLOB, string
-        sockets.forEach(aSocket => aSocket.send(message.toString('utf-8')));
+
+        console.log(msg.toString('utf-8')); // to parse Object
+        console.log(JSON.parse(msg)); // js object
+        const newData = JSON.parse(msg);
+
+        switch(newData.type) {
+            case "new_message" :
+                return sockets.forEach(aSocket => aSocket.send(`${socket.nickname} : ${newData.payload}`));
+            case "nickname" :
+                console.log(newData.payload);
+                socket["nickname"] = newData.payload;
+
+                break;
+            default :
+                break;
+        }
+        
     });
 });
 
