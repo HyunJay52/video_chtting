@@ -1,4 +1,5 @@
-import { WebSocketServer } from 'ws';
+//import { WebSocketServer } from 'ws';
+import SocketIO from 'socket.io';
 import http from 'http';
 import express from 'express'; // http
 
@@ -18,13 +19,18 @@ const handleListen = () => console.log(`listening on ws and http://localhost:300
 // app.listen(3000, handleListen); only listen http
 
 // create sever by using express app -> http
-const server = http.createServer(app);
+const httpServer = http.createServer(app);
 // create WebSocket server and pass "http server"
-const wss = new WebSocketServer({server});
+//const wss = new WebSocketServer({server});
+// create SocketIO server
+const wsServer = SocketIO(httpServer); 
 
+wsServer.on("connection", (socket) => {
+    console.log(socket);
+})
+
+/* request connection from front-end
 const sockets = [];
-
-// request connection from front-end
 wss.on("connection", (socket) => {
     console.log("connected to brower ✅");
 
@@ -53,11 +59,11 @@ wss.on("connection", (socket) => {
         }
         
     });
-});
+});     */
 
 
 // listen
-server.listen(3000, handleListen);
+httpServer.listen(3000, handleListen);
 
 
 
