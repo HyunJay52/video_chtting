@@ -26,9 +26,17 @@ const httpServer = http.createServer(app);
 const wsServer = SocketIO(httpServer); 
 
 wsServer.on("connection", (socket) => {
-    socket.on("enter_room", (msg, cb) => {
-        console.log(msg);
-        setTimeout(() => { cb(); }, 100);
+    socket.onAny((event) => {
+        console.log(`Socket Event: ${event}`);
+    })
+    // able to create own function
+    socket.on("enter_room", (roomName, cb) => {
+        // no need to parse JSON data
+        socket.join(roomName.payload); // create chatting room
+        const room_title = roomName.payload;
+        setTimeout(() => { cb(room_title); }, 100);
+
+        socket.to(roomName.payload).emit("welcome"); // send message to everybody except for me
     });
 })
 
