@@ -38,6 +38,16 @@ wsServer.on("connection", (socket) => {
 
         socket.to(roomName.payload).emit("welcome"); // send message to everybody except for me
     });
+
+    // 방에서 나감
+    socket.on("disconnecting", () => {
+        socket.rooms.forEach((room) => socket.to(room).emit("bye"));
+    });
+
+    socket.on("new_msg", (msg, room, cb) => {
+        socket.to(room).emit("new_msg", msg);
+        cb();
+    });
 })
 
 /* request connection from front-end
