@@ -4,7 +4,6 @@ const welcome = document.getElementById("welcome")
 const form = welcome.querySelector("form")
 
 const room = document.getElementById("room")
-
 room.hidden = true
 
 let roomName;
@@ -21,13 +20,23 @@ function addMessage(msg) {
 function handleMessageSubmit(event) {
     event.preventDefault();
 
-    const input = room.querySelector("input");
+    const input = room.querySelector("#msg input");
     const msg = input.value;
     socket.emit("new_msg", input.value, roomName, () => {
         addMessage(`Me : ${msg}`);
         //input.value = "";
     });
     input.value = "";
+}
+function handleNameSubmit(event) {
+    event.preventDefault();
+
+    const input = room.querySelector("#name input");
+    const name = input.value;
+
+    socket.emit("new_name", {payload: name}, () => {
+        console.log("set a nickname!");
+    });
 }
 
 form.addEventListener("submit", (event) => {
@@ -44,9 +53,11 @@ form.addEventListener("submit", (event) => {
         welcome.hidden = true;
         room.hidden = false;
 
-        const msg_form = room.querySelector("form");
+        const msg_form = room.querySelector("#msg");
+        const name_form = room.querySelector('#name');
 
         msg_form.addEventListener("submit", handleMessageSubmit);
+        name_form.addEventListener("submit", handleNameSubmit);
     });
     roomName = input.value;
     input.value = ""
@@ -54,12 +65,12 @@ form.addEventListener("submit", (event) => {
 
 
 // callback이 아니라 바로 실행 ? socket.on("welcome", addMessage("someone jsut joined!"));
-socket.on("welcome", () => {
-    addMessage("someone jsut joined!");
+socket.on("welcome", (user) => {
+    addMessage(`${user} just joined ! 🆕`);
 });
 
-socket.on("bye", () => {
-    addMessage("someone just left...🥲");
+socket.on("bye", (left) => {
+    addMessage(`${left} just left 👋`);
 })
 
 socket.on("new_msg", (msg) => {

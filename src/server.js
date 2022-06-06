@@ -26,8 +26,10 @@ const httpServer = http.createServer(app);
 const wsServer = SocketIO(httpServer); 
 
 wsServer.on("connection", (socket) => {
-    socket.onAny((event) => {
-        console.log(`Socket Event: ${event}`);
+    socket["nickname"] = "Anon"
+
+    socket.onAny((event) => { // init on every event
+        console.log(`Socket Event: ${event}`); // name of event
     })
     // able to create own function
     socket.on("enter_room", (roomName, cb) => {
@@ -36,16 +38,22 @@ wsServer.on("connection", (socket) => {
         const room_title = roomName.payload;
         setTimeout(() => { cb(room_title); }, 100);
 
-        socket.to(roomName.payload).emit("welcome"); // send message to everybody except for me
+        socket.to(roomName.payload).emit("welcome", socket.nickname); // send message to everybody except for me
     });
 
     // 방에서 나감
     socket.on("disconnecting", () => {
-        socket.rooms.forEach((room) => socket.to(room).emit("bye"));
+        socket.rooms.forEach((room) => socket.to(room).emit("bye"), socket.nickname);
     });
 
     socket.on("new_msg", (msg, room, cb) => {
-        socket.to(room).emit("new_msg", msg);
+        socket.to(room).emit("new_msg", `${socket.nickname} : ${msg}`);
+        cb();
+    });
+
+    socket.on("new_name", (name, cb) => {
+        socket["nickname"] = name.payload;
+        socket.emit(name.payload);
         cb();
     });
 })
