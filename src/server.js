@@ -25,10 +25,30 @@ const httpServer = http.createServer(app);
 // create SocketIO server
 const wsServer = SocketIO(httpServer); 
 
+//Room Count part one!
+function publicRoom() {
+    const {
+        sockets: {
+            adapter: {sids, rooms}, // {private room, public room}
+        },
+    } = wsServer;
+
+    const publicRooms = [];
+
+    rooms.forEach((_, key) => {
+        if(sids.get(key) === undefined) {
+            publicRoom.push(key);
+        }
+    });
+
+    return publicRooms;
+}
+
 wsServer.on("connection", (socket) => {
     socket["nickname"] = "Anon"
 
     socket.onAny((event) => { // init on every event
+        console.log(wsServer.sockets.apdater);
         console.log(`Socket Event: ${event}`); // name of event
     })
     // able to create own function
